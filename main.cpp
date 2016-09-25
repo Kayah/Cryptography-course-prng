@@ -26,11 +26,14 @@ int l20(int &x);
 int l89(int x[3], int size);
 int geffe(int &L1, int &L2, int &L3);
 int wolfram(int &L);
+char librarian(char text[], int &ptr);
+void read_file(char name[], char buf[], int size);
 int main() {
   mpz_class T,r;
   T = pow(2,12);
   r = pow(5,56);
   int N = 200000;
+  int N_librarian = 131072;
   double a = 0.01;
   int r_ch = 66;
   double alpa = 0.001;
@@ -43,7 +46,10 @@ int main() {
   int L;
   int L_mas[3];
   int L1, L2, L3;
- 
+  char buf[N_librarian];
+  auto ptr = 0;
+
+
   cout << "1) Built-in RNG" << endl;
   int seed = (time(nullptr)); // start seed
   srand(seed);
@@ -122,6 +128,14 @@ int main() {
   }
   check(mas, 131072, alpa, 24);  
 
+  cout << "8) Librarian" << endl;
+  read_file("dune.txt", buf, N_librarian);
+  for (auto i = 0; i < N_librarian; i++)
+  {
+    mas[i] = librarian(buf, ptr);
+  }
+  check(mas, N_librarian, alpa, 512);
+
   char* bmdata = blum_mikali_array(T,N);
   std::cout<<"passing test by blum_mikali"<<" coeficient a = "<<a<<std::endl;
   std::cout<<criterion_equal_probability(bmdata,N,a)<<std::endl;
@@ -147,6 +161,31 @@ int main() {
   std::cout<<criterion_homogeneity(data_for_bbs_byte,N,a,r_ch)<<std::endl;
   delete [] data_for_bbs_byte, data_for_bm_byte, bmdata, bbsdata;
   return 0;
+}
+char librarian(char text[], int &ptr)
+{
+  if (++ptr!='/0')
+  {
+    return text[ptr];
+  }
+  return 0;
+}
+
+void read_file(char name[], char buf[], int size)
+{
+  auto *f = fopen(name, "rb");
+  if (f)
+  {
+    fread(buf, 1, size, f);
+    /*for (auto i = 0; i < size; i++)
+    {
+      cout << (buf[i] & 255) << endl;
+    }*/
+  }
+  else
+  {
+    cout << "Error while opening the file." << endl;
+  }
 }
 void left_shift(int L[], int size)
 { 
